@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  proxy:
+    build: ./
+    restart: always
+    image: docker-proxy
+    container_name: proxy
+    networks:
+    ports:
+      - 80:80
+      - 443:443
+
+networks:

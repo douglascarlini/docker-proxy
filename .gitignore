@@ -1,0 +1,16 @@
+# CONFIG TEMPLATE FILES
+/docker-compose.yml
+/not-found.html
+/default.conf
+/site.conf
+
+# SSL CERTS
+ssl/*
+
+# FILES
+*.log
+*.sh
+
+# KEEP DEPLOY
+!deploy.sh
+
