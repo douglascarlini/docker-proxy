@@ -8,7 +8,7 @@ function error()
 
 line=10
 total=0
-ip=$(ifconfig | grep -A 1 eth0 | tail -1 | awk '{print $2}')
+ip="127.0.0.1"
 
 if ! [ -f default.conf ]; then { cp templates/default.conf default.conf; } || { error "Copy NGINX default config fails"; }; fi
 if ! [ -f not-found.html ]; then { cp templates/not-found.html not-found.html; } || { error "Copy not-found template fails"; }; fi
