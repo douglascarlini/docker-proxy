@@ -25,13 +25,13 @@ for host in "$@"; do
 
     # Copy template and configure site
     { cp templates/site.conf site.conf; } || { error "Copy site template file fails"; }
-    { sed -i "s/{host}/$host/g" site.conf; } || { error "Configure site template file fails"; }
+    { sed -i '' "s/{host}/$host/g" site.conf; } || { error "Configure site template file fails"; }
 
     # Add site to default configuration
     { cat site.conf | cat - default.conf > temp && mv temp default.conf; } || { error "Add site to NGINX fails"; }
 
     # Add app network to proxy service
-    { sed -i "${line}s/^/      \- $host\n/g" docker-compose.yml; } || { error "Add site network to proxy fails"; }
+    { sed -i '' "${line}s/^/      \- $host\n/g" docker-compose.yml; } || { error "Add site network to proxy fails"; }
     { printf "  $host:\n    external:\n      name: $host\n" >> docker-compose.yml; } || { error "Add external network fails"; }
 
     # Generate auto-signed SSL certified
@@ -41,22 +41,22 @@ for host in "$@"; do
 
       echo "[INFO] Generating auto-signed SSL certified..."
 
-      { openssl genrsa -out ssl/$host/server.key 2048 &> /dev/null; } || { error "Create SSL key fails"; }
-      { openssl req -new -key ssl/$host/server.key -sha256 -out ssl/$host/server.csr -subj "/CN=${host}" &> /dev/null; } || { error "Create SSL csr fails"; }
-      { openssl x509 -req -days 365 -in ssl/$host/server.csr -signkey ssl/$host/server.key -sha256 -out ssl/$host/server.crt &> /dev/null; } || { error "Create SSL crt fails"; }
+      { openssl genrsa -out ssl/$host/server.key 2048 &>/dev/null; } || { error "Create SSL key fails"; }
+      { openssl req -new -key ssl/$host/server.key -sha256 -out ssl/$host/server.csr -subj "/CN=${host}" &>/dev/null; } || { error "Create SSL csr fails"; }
+      { openssl x509 -req -days 365 -in ssl/$host/server.csr -signkey ssl/$host/server.key -sha256 -out ssl/$host/server.crt &>/dev/null; } || { error "Create SSL crt fails"; }
       
     fi
 
     # Create network if not exists
     if [ -z "$(docker network ls | grep $host)" ]; then
       echo "[INFO] Creating private network for $host..."
-      { docker network create $host >> $log &> /dev/null; } || { error "Create network fails"; }
+      { docker network create $host &>/dev/null; } || { error "Create network fails"; }
     fi
 
     # Add site to /etc/hosts
     if [ -z "$(cat /etc/hosts | grep $host)" ]; then
       echo "[INFO] Trying to add site entry to /etc/hosts file..."
-      { echo "$ip $host" >> /etc/hosts &> /dev/null; } || { echo "[WARN] You must add site to /etc/hosts file manually."; }
+      { echo "$ip $host" >> /etc/hosts &>/dev/null; } || { echo "[WARN] You must add site to /etc/hosts file manually."; }
     fi
     
     # Sites configured
@@ -75,10 +75,10 @@ if [ $total -gt 0 ]; then
   # Build and UP proxy service
 
   printf "\n[INFO] Building proxy image...\n"
-  { docker-compose build &> /dev/null; } || { error "Build fails"; }
+  { docker-compose build &>/dev/null; } || { error "Build fails"; }
 
   printf "[INFO] Running proxy service...\n"
-  { docker-compose up -d &> /dev/null; } || { error "Start fails"; }
+  { docker-compose up -d &>/dev/null; } || { error "Start fails"; }
 
   printf "\n[INFO] Service deploy time: $(($SECONDS / 60))m$(($SECONDS % 60))s\n\n"
   
