@@ -55,8 +55,9 @@ for host in "$@"; do
 
     # Add site to /etc/hosts
     if [ -z "$(cat /etc/hosts | grep $host)" ]; then
-      echo "[INFO] Trying to add site entry to /etc/hosts file..."
-      { echo "$ip $host" >> /etc/hosts &>/dev/null; } || { echo "[WARN] You must add site to /etc/hosts file manually."; }
+      echo "[INFO] Trying to add site entries to /etc/hosts file..."
+      { echo "$ip $host" >> /etc/hosts &>/dev/null; } || { echo "[WARN] You must add $host to /etc/hosts file manually."; }
+      { echo "$ip www.$host" >> /etc/hosts &>/dev/null; } || { echo "[WARN] You must add www.$host to /etc/hosts file manually."; }
     fi
     
     # Sites configured
