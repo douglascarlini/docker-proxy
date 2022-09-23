@@ -52,11 +52,11 @@ if ! [ -f "conf.d/$site.conf" ]; then
     { docker network create $net &>/dev/null; } || { error "Create network fails"; }
   fi
 
-  # Add site to /etc/sites
-  if [ -z "$(cat /etc/sites | grep $site)" ]; then
-    echo "[INFO] Trying to add site entries to /etc/sites file..."
-    { echo "$ip $site" >> /etc/sites &>/dev/null; } || { echo "[WARN] You must add $site to /etc/sites file manually."; }
-    { echo "$ip www.$site" >> /etc/sites &>/dev/null; } || { echo "[WARN] You must add www.$site to /etc/sites file manually."; }
+  # Add site to /etc/hosts
+  if [ -z "$(cat /etc/hosts | grep $site)" ]; then
+    echo "[INFO] Trying to add site entries to /etc/hosts file..."
+    { echo "$ip $site" >> /etc/hosts &>/dev/null; } || { echo "[WARN] You must add $site to /etc/hosts file manually."; }
+    { echo "$ip www.$site" >> /etc/hosts &>/dev/null; } || { echo "[WARN] You must add www.$site to /etc/hosts file manually."; }
   fi
 
   # Sites configured
