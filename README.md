@@ -11,21 +11,8 @@ Reverse Proxy with NGINX for Docker web applications.
 
 ### Example
 
-For site `site1.com`:
+`bash deploy.sh <your-site> <site-container> <container-network>`
 
-- Your app container must be named `site1.com`
-- Your app container must be running on network `site1.com`
-- Your app container must have ports `80` and `443` exposed
+For site `site1.com` on container `site1_app` on network `site1_default`:
 
-### Create Reverse Proxy and add Site
-
-```bash
-bash deploy.sh site1.com site2.com site3.com
-```
-### SSL Certified
-
-You can update SSL certified for your site with command:
-
-```bash
-docker cp /path/to/files proxy:/etc/ssl/certs/nginx/{site}
-```
+`bash deploy.sh site1.com site1_app site1_default`

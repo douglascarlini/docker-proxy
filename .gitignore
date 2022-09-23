@@ -1,8 +1,7 @@
 # CONFIG TEMPLATE FILES
-/docker-compose.yml
-/not-found.html
-/default.conf
-/site.conf
+conf.d/*
+docker-compose.yml
+!conf.d/default.conf
 
 # SSL CERTS
 ssl/*
