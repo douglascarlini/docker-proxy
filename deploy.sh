@@ -26,12 +26,12 @@ if ! [ -f "conf.d/$site.conf" ]; then
 
   # Copy template and configure site
   { cp templates/site.conf conf.d/$site.conf; } || { error "Copy site template file fails"; }
-  { sed -i "s/{site}/$site/g" conf.d/$site.conf; } || { error "Configure site template file fails"; }
-  { sed -i "s/{name}/$name/g" conf.d/$site.conf; } || { error "Configure site template file fails"; }
+  { sed -i '' "s/{site}/$site/g" conf.d/$site.conf; } || { error "Configure site template file fails"; }
+  { sed -i '' "s/{name}/$name/g" conf.d/$site.conf; } || { error "Configure site template file fails"; }
 
   # Add app network to proxy service
   if [ -z "$(cat docker-compose.yml | grep $net)" ]; then
-    { sed -i "${line}s/^/      \- $net\n/g" docker-compose.yml; } || { error "Add site network to proxy fails"; }
+    { sed -i '' "${line}s/^/      \- $net\n/g" docker-compose.yml; } || { error "Add site network to proxy fails"; }
     { printf "  $net:\n    external:\n      name: $net\n" >> docker-compose.yml; } || { error "Add external network fails"; }
   fi
 
