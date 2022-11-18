@@ -75,7 +75,7 @@ if [ $total -gt 0 ]; then
   # Build and UP proxy service
 
   printf "[INFO] Running proxy service...\n"
-  { docker-compose up -d &>/dev/null; } || { error "Start fails"; }
+  { docker-compose up -d --build &>/dev/null; } || { error "Start fails"; }
 
   printf "\n[INFO] Service deploy time: $(($SECONDS / 60))m$(($SECONDS % 60))s\n\n"
 
