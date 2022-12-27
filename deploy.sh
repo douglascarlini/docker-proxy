@@ -30,17 +30,17 @@ for app in $apps; do
 
     # Copy template and configure site
     { cp templates/site.conf conf.d/$site.conf; } || { error "Copy site template file fails"; }
-    { sed -i "s/{site}/$site/g" conf.d/$site.conf; } || { error "Configure site template file fails"; }
-    { sed -i "s/{name}/$name/g" conf.d/$site.conf; } || { error "Configure site template file fails"; }
+    { sed -i '' "s/{site}/$site/g" conf.d/$site.conf; } || { error "Configure site template file fails"; }
+    { sed -i '' "s/{name}/$name/g" conf.d/$site.conf; } || { error "Configure site template file fails"; }
 
     # Configure instances (servers)
     for (( i=1; i<=$scale; i++ )); do
-      { sed -i "s/ip_hash\;/ip_hash\;\n\tserver $name-$i\;/g" conf.d/$site.conf; } || { error "Configure app instance $i fails"; }
+      { sed -i '' "s/ip_hash\;/ip_hash\;\n\tserver $name-$i\;/g" conf.d/$site.conf; } || { error "Configure app instance $i fails"; }
     done
 
     # Add app network to proxy service
     if [ -z "$(cat docker-compose.yml | grep $net)" ]; then
-      { sed -i "${line}s/^/      \- $net\n/g" docker-compose.yml; } || { error "Add site network to proxy fails"; }
+      { sed -i '' "${line}s/^/      \- $net\n/g" docker-compose.yml; } || { error "Add site network to proxy fails"; }
       { printf "  $net:\n      name: $net\n" >> docker-compose.yml; } || { error "Add external network fails"; }
     fi
 
