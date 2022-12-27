@@ -13,3 +13,5 @@ ssl/*
 # KEEP DEPLOY
 !deploy.sh
 
+# CONFIG
+apps.txt

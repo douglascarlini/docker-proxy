@@ -3,17 +3,11 @@ version: "3"
 services:
 
   proxy:
-    image: nginx
-    container_name: proxy
+    image: nginx:latest
+    restart: always
     ports:
-      - target: 80
-        published: 80
-        protocol: tcp
-        mode: host
-      - target: 443
-        published: 443
-        protocol: tcp
-        mode: host
+      - "80:80"
+      - "443:443"
     volumes:
       - ./includes:/etc/nginx/includes
       - ./conf.d:/etc/nginx/conf.d
