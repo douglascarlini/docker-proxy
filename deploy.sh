@@ -37,28 +37,17 @@ if ! [ -d ssl/$site ]; then
 
 fi
 
-# Add site to /etc/hosts
-if [ -z "$(cat /etc/hosts | grep $site)" ]; then
-  echo "[INFO] Trying to add site entries to /etc/hosts file..."
-  { echo "127.0.0.1 $site" >>/etc/hosts &>/dev/null; } || { echo "[WARN] You must add $site to /etc/hosts file manually."; }
-  { echo "127.0.0.1 www.$site" >>/etc/hosts &>/dev/null; } || { echo "[WARN] You must add www.$site to /etc/hosts file manually."; }
-fi
-
 # Create network if not exists
 if [ -z "$(docker network ls | grep $net)" ]; then
   echo "[INFO] Creating private proxy network named $net..."
   { docker network create $net &>/dev/null; } || { error "Create network fails"; }
 fi
 
-if ! [ -z "$3" ]; then
+# Down proxy service
+{ docker-compose down &>/dev/null; }
 
-  # Down proxy service
-  { docker-compose down &>/dev/null; }
+# Build and UP proxy service
+printf "\n[INFO] Running proxy service...\n"
+{ docker-compose up --build -d &>/dev/null; } || { error "Start fails"; }
 
-  # Build and UP proxy service
-  printf "\n[INFO] Running proxy service...\n"
-  { docker-compose up --build -d &>/dev/null; } || { error "Start fails"; }
-
-  printf "[INFO] Service deploy time: $(($SECONDS / 60))m$(($SECONDS % 60))s\n\n"
-
-fi
+printf "[INFO] Service deploy time: $(($SECONDS / 60))m$(($SECONDS % 60))s\n\n"

@@ -21,7 +21,7 @@ chmod +x deploy.sh
 # Add apps to proxy
 ./deploy.sh app1.$domain 20801
 ./deploy.sh app2.$domain 20802
-./deploy.sh app3.$domain 20803 yes
+./deploy.sh app3.$domain 20803
 
 # Listen logs
 docker logs -f proxy
