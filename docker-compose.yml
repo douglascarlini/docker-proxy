@@ -13,5 +13,7 @@ services:
       - ./conf.d:/etc/nginx/conf.d
       - ./ssl:/etc/ssl/certs/nginx
     networks:
+      - proxy_network
 
 networks:
+  proxy_network:

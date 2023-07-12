@@ -1,87 +1,52 @@
 #!/bin/bash
 
-function error()
-{
+function error() {
   printf "\n\t[ERROR] $1\n\n"
   exit
 }
 
-line=16
-total=0
+site=$1
+port=$2
 
-apps=$(cat apps.txt)
-for app in $apps; do
+net="proxy_network"
 
-  A=($(echo $app | tr ";" " "))
-  domain=${A[0]}; project=${A[1]}; service=${A[2]}; scale=${A[3]}
+printf "\n[INFO] Site $site\n"
 
-  site=$domain
-  net="${project}_default"
-  name="${project}-${service}"
+# Check if site already exists
+if ! [ -f "conf.d/$site.conf" ]; then
 
-  if ! [ -f docker-compose.yml ]; then { cp templates/docker-compose.yml docker-compose.yml; } || { error "Copy docker compose file fails"; }; fi
+  echo "[INFO] Configuring site..."
 
-  printf "\n[INFO] Site $site\n"
+  # Copy template and configure site
+  { cp templates/site.conf conf.d/$site.conf; } || { error "Copy site template file fails"; }
+  { sed -i "s/{site}/$site/g" conf.d/$site.conf; } || { error "Configure site template file fails"; }
+  { sed -i "s/ip_hash\;/ip_hash\;\n\tserver localhost:$port\;/g" conf.d/$site.conf; } || { error "Configure nginx stream fails"; }
 
-  # Check if site already exists
-  if ! [ -f "conf.d/$site.conf" ]; then
+  # Generate auto-signed SSL certified
+  if ! [ -d ssl/$site ]; then
 
-    echo "[INFO] Configuring site..."
+    { mkdir -p ssl/$site; } || { exit; }
 
-    # Copy template and configure site
-    { cp templates/site.conf conf.d/$site.conf; } || { error "Copy site template file fails"; }
-    { sed -i "s/{site}/$site/g" conf.d/$site.conf; } || { error "Configure site template file fails"; }
-    { sed -i "s/{name}/$name/g" conf.d/$site.conf; } || { error "Configure site template file fails"; }
+    echo "[INFO] Generating auto-signed SSL certified..."
 
-    # Configure instances (servers)
-    for (( i=1; i<=$scale; i++ )); do
-      { sed -i "s/ip_hash\;/ip_hash\;\n\tserver $name-$i\;/g" conf.d/$site.conf; } || { error "Configure app instance $i fails"; }
-    done
-
-    # Add app network to proxy service
-    if [ -z "$(cat docker-compose.yml | grep $net)" ]; then
-      { sed -i "${line}s/^/      \- $net\n/g" docker-compose.yml; } || { error "Add site network to proxy fails"; }
-      { printf "  $net:\n      name: $net\n" >> docker-compose.yml; } || { error "Add external network fails"; }
-    fi
-
-    # Generate auto-signed SSL certified
-    if ! [ -d ssl/$site ]; then
-
-      { mkdir -p ssl/$site; } || { exit; }
-
-      echo "[INFO] Generating auto-signed SSL certified..."
-
-      { openssl genrsa -out ssl/$site/server.key 2048 &>/dev/null; } || { error "Create SSL key fails"; }
-      { openssl req -new -key ssl/$site/server.key -sha256 -out ssl/$site/server.csr -subj "/CN=${site}" &>/dev/null; } || { error "Create SSL csr fails"; }
-      { openssl x509 -req -days 365 -in ssl/$site/server.csr -signkey ssl/$site/server.key -sha256 -out ssl/$site/server.crt &>/dev/null; } || { error "Create SSL crt fails"; }
-
-    fi
-
-    # Create network if not exists
-    if [ -z "$(docker network ls | grep $net)" ]; then
-      echo "[INFO] Creating private network for $net..."
-      { docker network create $net &>/dev/null; } || { error "Create network fails"; }
-    fi
-
-    # Add site to /etc/hosts
-    if [ -z "$(cat /etc/hosts | grep $site)" ]; then
-      echo "[INFO] Trying to add site entries to /etc/hosts file..."
-      { echo "127.0.0.1 $site" >> /etc/hosts &>/dev/null; } || { echo "[WARN] You must add $site to /etc/hosts file manually."; }
-      { echo "127.0.0.1 www.$site" >> /etc/hosts &>/dev/null; } || { echo "[WARN] You must add www.$site to /etc/hosts file manually."; }
-    fi
-
-    # Sites configured
-    total=$((total+1))
-
-  else
-
-    echo "[WARN] Site already configured"
+    { openssl genrsa -out ssl/$site/server.key 2048 &>/dev/null; } || { error "Create SSL key fails"; }
+    { openssl req -new -key ssl/$site/server.key -sha256 -out ssl/$site/server.csr -subj "/CN=${site}" &>/dev/null; } || { error "Create SSL csr fails"; }
+    { openssl x509 -req -days 365 -in ssl/$site/server.csr -signkey ssl/$site/server.key -sha256 -out ssl/$site/server.crt &>/dev/null; } || { error "Create SSL crt fails"; }
 
   fi
 
-done
+  # Add site to /etc/hosts
+  if [ -z "$(cat /etc/hosts | grep $site)" ]; then
+    echo "[INFO] Trying to add site entries to /etc/hosts file..."
+    { echo "127.0.0.1 $site" >>/etc/hosts &>/dev/null; } || { echo "[WARN] You must add $site to /etc/hosts file manually."; }
+    { echo "127.0.0.1 www.$site" >>/etc/hosts &>/dev/null; } || { echo "[WARN] You must add www.$site to /etc/hosts file manually."; }
+  fi
 
-if [ $total -gt 0 ]; then
+  # Create network if not exists
+  if [ -z "$(docker network ls | grep $net)" ]; then
+    echo "[INFO] Creating private proxy network named $net..."
+    { docker network create $net &>/dev/null; } || { error "Create network fails"; }
+  fi
 
   # Down proxy service
   { docker-compose down &>/dev/null; }
@@ -94,6 +59,6 @@ if [ $total -gt 0 ]; then
 
 else
 
-  printf "\n[WARN] No changes\n\n"
+  echo "[WARN] Site already configured"
 
 fi

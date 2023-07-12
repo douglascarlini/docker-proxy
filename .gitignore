@@ -1,6 +1,5 @@
 # CONFIG TEMPLATE FILES
 conf.d/*
-docker-compose.yml
 !conf.d/default.conf
 
 # SSL CERTS
@@ -11,7 +10,5 @@ ssl/*
 *.sh
 
 # KEEP DEPLOY
+!example.sh
 !deploy.sh
-
-# CONFIG
-apps.txt
