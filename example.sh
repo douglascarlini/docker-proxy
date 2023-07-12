@@ -10,7 +10,7 @@ rm -rf conf.d
 git reset --hard && git pull
 
 # Stop and delete all containers
-docker stop $(docker ps -aq) && docker rm $(docker ps -aq)
+{ docker stop $(docker ps -aq) && docker rm $(docker ps -aq); } || { echo ""; }
 
 # Create and deploy apps containers
 docker run --name app1 -v $PWD/www/app1:/usr/share/nginx/html -p 20801:80 -d nginx
