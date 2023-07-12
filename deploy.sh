@@ -23,17 +23,17 @@ lines=$(cat sites.txt)
 
 for line in $lines; do
 
+  info $line
+
   data=($(echo $line | tr ";" " "))
 
   site=${data[0]}
   port=${data[1]}
 
-  info "Site $site on port $port..."
-
   # Check if site already exists
   if ! [ -f "conf.d/$site.conf" ]; then
 
-    info "Configuring site..."
+    info "Site $site on port $port..."
 
     # Copy template and configure site
     { cp templates/site.conf conf.d/$site.conf; } || { fail "Copy site template file fails"; }
