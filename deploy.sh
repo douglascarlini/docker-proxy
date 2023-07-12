@@ -50,11 +50,15 @@ if [ -z "$(docker network ls | grep $net)" ]; then
   { docker network create $net &>/dev/null; } || { error "Create network fails"; }
 fi
 
-# Down proxy service
-{ docker-compose down &>/dev/null; }
+if ! [ -z "$3" ]; then
 
-# Build and UP proxy service
-printf "\n[INFO] Running proxy service...\n"
-{ docker-compose up --build -d &>/dev/null; } || { error "Start fails"; }
+  # Down proxy service
+  { docker-compose down &>/dev/null; }
 
-printf "[INFO] Service deploy time: $(($SECONDS / 60))m$(($SECONDS % 60))s\n\n"
+  # Build and UP proxy service
+  printf "\n[INFO] Running proxy service...\n"
+  { docker-compose up --build -d &>/dev/null; } || { error "Start fails"; }
+
+  printf "[INFO] Service deploy time: $(($SECONDS / 60))m$(($SECONDS % 60))s\n\n"
+
+fi
