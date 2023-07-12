@@ -21,8 +21,6 @@ lines=$(cat sites.txt)
 
 for line in $lines; do
 
-  info $line
-
   data=($(echo $line | tr ";" " "))
 
   site=${data[0]}
