@@ -14,4 +14,3 @@ services:
       - ./includes:/etc/nginx/includes
       - ./conf.d:/etc/nginx/conf.d
       - ./ssl:/etc/ssl/certs/nginx
-      - ./www/html:/var/www/html
