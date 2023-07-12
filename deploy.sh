@@ -1,12 +1,23 @@
 #!/bin/bash
 
-function error() {
-  printf "\n\t[ERROR] $1\n\n"
+function fail() {
+  printf "[FAIL] $1\n"
   exit
 }
 
-if ! [ -f "sites.txt" ]; then error "Sites file not found"; fi
+function warn() {
+  printf "[WARN] $1\n"
+  exit
+}
 
+function info() {
+  printf "[INFO] $1\n"
+  exit
+}
+
+if ! [ -f "sites.txt" ]; then fail "Sites file not found"; fi
+
+total=0
 net="proxy_network"
 lines=$(cat sites.txt)
 
@@ -17,46 +28,47 @@ for line in $lines; do
   site=${data[0]}
   port=${data[1]}
 
-  printf "\n[INFO] Site $site on port $port...\n"
+  info "Site $site on port $port..."
 
   # Check if site already exists
   if ! [ -f "conf.d/$site.conf" ]; then
 
-    echo "[INFO] Configuring site..."
+    info "Configuring site..."
 
     # Copy template and configure site
-    { cp templates/site.conf conf.d/$site.conf; } || { error "Copy site template file fails"; }
-    { sed -i "s/{site}/$site/g" conf.d/$site.conf; } || { error "Configure site template file fails"; }
-    { sed -i "s/ip_hash\;/ip_hash\;\n\tserver localhost:$port\;/g" conf.d/$site.conf; } || { error "Configure nginx stream fails"; }
+    { cp templates/site.conf conf.d/$site.conf; } || { fail "Copy site template file fails"; }
+    { sed -i "s/{site}/$site/g" conf.d/$site.conf; } || { fail "Configure site template file fails"; }
+    { sed -i "s/ip_hash\;/ip_hash\;\n\tserver localhost:$port\;/g" conf.d/$site.conf; } || { fail "Configure nginx stream fails"; }
 
-  fi
+    # Generate auto-signed SSL certified
+    if ! [ -d ssl/$site ]; then
 
-  # Generate auto-signed SSL certified
-  if ! [ -d ssl/$site ]; then
+      { mkdir -p ssl/$site; } || { exit; }
 
-    { mkdir -p ssl/$site; } || { exit; }
+      info "Generating auto-signed SSL certified..."
 
-    echo "[INFO] Generating auto-signed SSL certified..."
+      { openssl genrsa -out ssl/$site/server.key 2048 &>/dev/null; } || { fail "Create SSL key fails"; }
+      { openssl req -new -key ssl/$site/server.key -sha256 -out ssl/$site/server.csr -subj "/CN=${site}" &>/dev/null; } || { fail "Create SSL csr fails"; }
+      { openssl x509 -req -days 365 -in ssl/$site/server.csr -signkey ssl/$site/server.key -sha256 -out ssl/$site/server.crt &>/dev/null; } || { fail "Create SSL crt fails"; }
 
-    { openssl genrsa -out ssl/$site/server.key 2048 &>/dev/null; } || { error "Create SSL key fails"; }
-    { openssl req -new -key ssl/$site/server.key -sha256 -out ssl/$site/server.csr -subj "/CN=${site}" &>/dev/null; } || { error "Create SSL csr fails"; }
-    { openssl x509 -req -days 365 -in ssl/$site/server.csr -signkey ssl/$site/server.key -sha256 -out ssl/$site/server.crt &>/dev/null; } || { error "Create SSL crt fails"; }
+    fi
 
-  fi
+    # Sites configured
+    total=$((total + 1))
 
-  # Create network if not exists
-  if [ -z "$(docker network ls | grep $net)" ]; then
-    echo "[INFO] Creating private proxy network named $net..."
-    { docker network create $net &>/dev/null; } || { error "Create network fails"; }
   fi
 
 done
 
-# Down proxy service
-{ docker-compose down &>/dev/null; }
+if [ $total -gt 0 ]; then
 
-# Build and UP proxy service
-printf "\n[INFO] Running proxy service...\n"
-{ docker-compose up --build -d &>/dev/null; } || { error "Start fails"; }
+  # Down proxy service
+  { docker-compose down &>/dev/null; }
 
-printf "[INFO] Service deploy time: $(($SECONDS / 60))m$(($SECONDS % 60))s\n\n"
+  # Build and UP proxy service
+  info "Running proxy service..."
+  { docker-compose up --build -d &>/dev/null; } || { fail "Start fails"; }
+
+  info "Service deploy time: $(($SECONDS / 60))m$(($SECONDS % 60))s"
+
+fi
