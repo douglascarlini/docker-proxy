@@ -5,6 +5,8 @@ domain=$1
 # Reset
 rm -rf ssl
 rm -rf conf.d
+
+# Reset git and update
 git reset --hard && git pull
 
 # Stop and delete all containers
@@ -16,12 +18,4 @@ docker run --name app2 -v $PWD/www/app2:/usr/share/nginx/html -p 20802:80 -d ngi
 docker run --name app3 -v $PWD/www/app3:/usr/share/nginx/html -p 20803:80 -d nginx
 
 # Add permission
-chmod +x deploy.sh
-
-# Add apps to proxy
-./deploy.sh app1.$domain 20801
-./deploy.sh app2.$domain 20802
-./deploy.sh app3.$domain 20803
-
-# Listen logs
-docker logs -f proxy
+bash deploy.sh

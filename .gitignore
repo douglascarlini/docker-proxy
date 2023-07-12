@@ -12,3 +12,6 @@ ssl/*
 # KEEP DEPLOY
 !example.sh
 !deploy.sh
+
+# SITES
+sites.txt
