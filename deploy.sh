@@ -49,11 +49,8 @@ for line in $lines; do
 
     fi
 
-     # Protect container ports from external access
-    { iptables -D INPUT -p tcp --dport $port -s $local -j ACCEPT; } || { echo ""; }
-    { iptables -A INPUT -p tcp --dport $port -s $local -j ACCEPT; } || { echo ""; }
-    { iptables -D INPUT -p tcp --dport $port -j DROP; } || { echo ""; }
-    { iptables -A INPUT -p tcp --dport $port -j DROP; } || { echo ""; }
+    # Protect container ports from external access
+    { iptables -R DOCKER -p tcp --dport $port -s ! $local -j DROP; } || { echo ""; }
 
     # Sites configured
     total=$((total + 1))
