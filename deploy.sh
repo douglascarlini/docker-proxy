@@ -7,12 +7,10 @@ function fail() {
 
 function warn() {
   printf "[WARN] $1\n"
-  exit
 }
 
 function info() {
   printf "[INFO] $1\n"
-  exit
 }
 
 if ! [ -f "sites.txt" ]; then fail "Sites file not found"; fi
