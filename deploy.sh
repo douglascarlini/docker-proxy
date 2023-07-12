@@ -49,9 +49,6 @@ for line in $lines; do
 
     fi
 
-    # Protect container ports from external access
-    { iptables -R DOCKER -p tcp --dport $port -s ! $local -j DROP; } || { echo ""; }
-
     # Sites configured
     total=$((total + 1))
 
