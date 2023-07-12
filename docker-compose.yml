@@ -5,6 +5,7 @@ services:
   proxy:
     container_name: proxy
     image: nginx:latest
+    network_mode: host
     restart: always
     ports:
       - "80:80"
@@ -13,8 +14,3 @@ services:
       - ./includes:/etc/nginx/includes
       - ./conf.d:/etc/nginx/conf.d
       - ./ssl:/etc/ssl/certs/nginx
-    networks:
-      - proxy_network
-
-networks:
-  proxy_network:
