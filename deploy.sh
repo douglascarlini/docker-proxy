@@ -16,7 +16,7 @@ function info() {
 if ! [ -f "sites.txt" ]; then fail "Sites file not found"; fi
 
 total=0
-net="proxy_network"
+local="127.0.0.1"
 lines=$(cat sites.txt)
 
 for line in $lines; do
@@ -48,6 +48,12 @@ for line in $lines; do
       { openssl x509 -req -days 365 -in ssl/$site/server.csr -signkey ssl/$site/server.key -sha256 -out ssl/$site/server.crt &>/dev/null; } || { fail "Create SSL crt fails"; }
 
     fi
+
+     # Protect container ports from external access, but allow internal
+    iptables -D INPUT -p tcp --dport $port -s $local -j ACCEPT
+    iptables -A INPUT -p tcp --dport $port -s $local -j ACCEPT
+    iptables -D INPUT -p tcp --dport $port -j DROP
+    iptables -A INPUT -p tcp --dport $port -j DROP
 
     # Sites configured
     total=$((total + 1))
