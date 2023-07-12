@@ -3,10 +3,10 @@ version: "3"
 services:
 
   proxy:
-    container_name: proxy
     image: nginx:latest
-    network_mode: host
     restart: always
+    container_name: proxy
+    network_mode: host
     ports:
       - "80:80"
       - "443:443"
