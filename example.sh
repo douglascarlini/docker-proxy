@@ -8,7 +8,7 @@ rm -rf conf.d
 git reset --hard && git pull
 
 # Create proxy network
-docker rm proxy_network
+docker network rm proxy_network
 docker network create proxy_network
 
 # Stop and delete all containers
