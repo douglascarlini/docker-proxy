@@ -49,11 +49,11 @@ for line in $lines; do
 
     fi
 
-     # Protect container ports from external access, but allow internal
-    iptables -D INPUT -p tcp --dport $port -s $local -j ACCEPT
-    iptables -A INPUT -p tcp --dport $port -s $local -j ACCEPT
-    iptables -D INPUT -p tcp --dport $port -j DROP
-    iptables -A INPUT -p tcp --dport $port -j DROP
+     # Protect container ports from external access
+    { iptables -D INPUT -p tcp --dport $port -s $local -j ACCEPT; } || { echo ""; }
+    { iptables -A INPUT -p tcp --dport $port -s $local -j ACCEPT; } || { echo ""; }
+    { iptables -D INPUT -p tcp --dport $port -j DROP; } || { echo ""; }
+    { iptables -A INPUT -p tcp --dport $port -j DROP; } || { echo ""; }
 
     # Sites configured
     total=$((total + 1))
