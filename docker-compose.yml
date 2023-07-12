@@ -11,7 +11,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./www/html:/usr/share/nginx/html
       - ./includes:/etc/nginx/includes
       - ./conf.d:/etc/nginx/conf.d
       - ./ssl:/etc/ssl/certs/nginx
+      - ./www/html:/var/www/html
