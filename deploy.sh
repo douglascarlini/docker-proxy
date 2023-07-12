@@ -48,17 +48,17 @@ if ! [ -f "conf.d/$site.conf" ]; then
     { docker network create $net &>/dev/null; } || { error "Create network fails"; }
   fi
 
-  # Down proxy service
-  { docker-compose down &>/dev/null; }
-
-  # Build and UP proxy service
-  printf "\n[INFO] Running proxy service...\n"
-  { docker-compose up --build -d &>/dev/null; } || { error "Start fails"; }
-
-  printf "[INFO] Service deploy time: $(($SECONDS / 60))m$(($SECONDS % 60))s\n\n"
-
 else
 
   echo "[WARN] Site already configured"
 
 fi
+
+# Down proxy service
+{ docker-compose down &>/dev/null; }
+
+# Build and UP proxy service
+printf "\n[INFO] Running proxy service...\n"
+{ docker-compose up --build -d &>/dev/null; } || { error "Start fails"; }
+
+printf "[INFO] Service deploy time: $(($SECONDS / 60))m$(($SECONDS % 60))s\n\n"

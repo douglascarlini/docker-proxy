@@ -3,6 +3,7 @@ version: "3"
 services:
 
   proxy:
+    container_name: proxy
     image: nginx:latest
     restart: always
     ports:
