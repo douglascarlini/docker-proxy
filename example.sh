@@ -18,3 +18,6 @@ docker run --name app3 --network proxy_network -v $PWD/www/app3:/var/www/html -p
 ./deploy.sh app1.$domain 20801
 ./deploy.sh app2.$domain 20802
 ./deploy.sh app3.$domain 20803
+
+# Listen logs
+docker logs -f proxy
