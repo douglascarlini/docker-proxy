@@ -2,8 +2,12 @@
 
 domain=$1
 
-# Create the proxy network
+# Create proxy network
+docker rm proxy_network
 docker network create proxy_network
+
+# Stop and delete all containers
+docker stop $(docker ps -aq) && docker rm $(docker ps -aq)
 
 # Create and deploy apps containers
 docker run --name app1 --network proxy_network -v $PWD/www/app1:/var/www/html -p 20801:80 -d nginx
