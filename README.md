@@ -4,6 +4,12 @@ Reverse Proxy with NGINX with Docker.
 
 ### How to Use
 
-- Run your app container on network `proxy_network`;
-- Give execution permission to script with `chmod +x deploy.sh`;
-- Add site to proxy with `./deploy.sh --site app.example.com --port 8080`;
+Create an file `apps.txt` with yours hosts and ports:
+
+```
+app1.example.com;8081
+app2.example.com;8082
+app3.example.com;8083
+```
+
+Run `bash deploy.sh`
