@@ -4,7 +4,7 @@ Reverse Proxy with NGINX with Docker.
 
 ### How to Use
 
-Create an file `apps.txt` with yours hosts and ports:
+Create an file `sites.txt` with yours sites and ports:
 
 ```
 app1.example.com;8081
