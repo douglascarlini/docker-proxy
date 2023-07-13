@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+
+  proxy:
+    container_name: proxy
+    network_mode: host
+    image: nginx:1.24
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./certbot:/var/www/certbot:ro
+      - ./ssl:/etc/ssl/certs/nginx:ro
+      - ./conf.d:/etc/nginx/conf.d:ro
+      - ./config:/etc/nginx:ro
+      - ./logs:/var/log/nginx
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/:/var/www/certbot:rw
+      - ./certbot/conf:/etc/letsencrypt:rw

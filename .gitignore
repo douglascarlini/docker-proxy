@@ -1,0 +1,10 @@
+**/.DS_Store
+conf.d/*
+!conf.d/default.conf
+certbot/conf
+*.sh
+!deploy.sh
+!ssl.sh
+**/*.log
+sites.txt
+ssl/*
