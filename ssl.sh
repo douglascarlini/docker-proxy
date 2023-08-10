@@ -15,7 +15,7 @@ for line in $lines; do
         data=($(echo $line | tr ";" " "))
         site=${data[0]}
 
-        docker compose run --rm certbot certonly --webroot --webroot-path /var/www/certbot --email $email -d $site
+        docker-compose run --rm certbot certonly --webroot --webroot-path /var/www/certbot --email $email -d $site
 
         cp $certbot/$site/fullchain.pem $certs/$site/
         cp $certbot/$site/privkey.pem $certs/$site/

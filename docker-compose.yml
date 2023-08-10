@@ -11,10 +11,10 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./certbot:/var/www/certbot:ro
-      - ./ssl:/etc/ssl/certs/nginx:ro
-      - ./conf.d:/etc/nginx/conf.d:ro
-      - ./config:/etc/nginx:ro
+      - ./certbot:/var/www/certbot:rw
+      - ./ssl:/etc/ssl/certs/nginx:rw
+      - ./conf.d:/etc/nginx/conf.d:rw
+      - ./config:/etc/nginx:rw
       - ./logs:/var/log/nginx
 
   certbot:
