@@ -4,11 +4,9 @@ services:
 
   proxy:
     container_name: proxy
+    network_mode: host
     image: nginx:1.24
     restart: always
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
       - ./certbot:/var/www/certbot:rw
       - ./ssl:/etc/ssl/certs/nginx:rw
