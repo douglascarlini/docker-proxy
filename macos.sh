@@ -26,8 +26,7 @@ host=$(ipconfig getifaddr en0)
 regex="^[a-z][a-z0-9]+(\.[a-z][a-z0-9]+)+\;[0-9]{4,5}$"
 
 info "Running proxy container..."
-# Modify the Docker commands to work with Docker for Mac
-{ docker-compose up -d >$file 2>&1; } || { fail "Proxy start fails"; }
+{ docker-compose -f docker-compose-ports.yml up -d >$file 2>&1; } || { fail "Proxy start fails"; }
 
 for line in $lines; do
   ((index++))
@@ -64,7 +63,6 @@ for line in $lines; do
 done
 
 if [ $total -gt 0 ]; then
-  # Modify the Docker command to work with Docker for Mac
   info "Reloading proxy service..."
   { docker exec proxy nginx -s reload >$file 2>&1; } || { fail "Reload failed"; }
   info "Proxy service deploy time: $((SECONDS / 60))m$((SECONDS % 60))s"
