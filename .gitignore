@@ -3,7 +3,8 @@ conf.d/*
 !conf.d/default.conf
 certbot/conf
 *.sh
-!deploy.sh
+!linux.sh
+!macos.sh
 !ssl.sh
 **/*.log
 sites.txt

@@ -14,8 +14,9 @@ app2.example.com;8082
 app3.example.com;8083
 ```
 
-Run `bash deploy.sh`
+Run `bash linux.sh`
 
-### SSL
+### Let's Encrypt
 
-To generate valid SSL, run `bash ssl.sh admin@email.com`
+- To generate valid SSL, run `bash ssl.sh admin@admin.admin`
+- To renew certificates, run `bash ssl.sh admin@admin.admin renew`

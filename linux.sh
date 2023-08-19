@@ -19,13 +19,15 @@ if [ -z "$(cat sites.txt)" ]; then fail "Sites empty"; fi
 
 total=0
 index=0
+
 certs=$PWD/ssl
-local="127.0.0.1"
+file="deploy.log"
 lines=$(cat sites.txt)
+host=$(hostname -I | awk '{print $1}')
 regex="^[a-z][a-z0-9]+(\.[a-z][a-z0-9]+)+\;[0-9]{4,5}$"
 
 info "Running proxy container..."
-{ docker-compose up -d &>/dev/null; } || { fail "Proxy start fails"; }
+{ docker-compose up -d &>$file; } || { fail "Proxy start fails"; }
 
 for line in $lines; do
 
@@ -46,7 +48,7 @@ for line in $lines; do
       # Copy template and configure site
       { cp templates/site.conf conf.d/$site.conf; } || { fail "Copy site template file fails"; }
       { sed -i "s/{site}/$site/g" conf.d/$site.conf; } || { fail "Configure site template file fails"; }
-      { sed -i "s/ip_hash\;/ip_hash\;\n\tserver localhost:$port\;/g" conf.d/$site.conf; } || { fail "Configure nginx stream fails"; }
+      { sed -i "s/ip_hash\;/ip_hash\;\n\tserver $host:$port\;/g" conf.d/$site.conf; } || { fail "Configure nginx stream fails"; }
 
       # Generate auto-signed SSL certified
       if ! [ -d ssl/$site ]; then
@@ -55,10 +57,10 @@ for line in $lines; do
 
         info "Generating auto-signed SSL certified..."
 
-        { openssl genrsa -out $certs/$site/server.key 2048 &>/dev/null; } || { fail "Create SSL key fails"; }
-        { openssl req -new -key $certs/$site/server.key -sha256 -out $certs/$site/server.csr -subj "/CN=$site" &>/dev/null; } || { fail "Create SSL csr fails"; }
-        { openssl x509 -req -days 365 -in $certs/$site/server.csr -signkey $certs/$site/server.key -sha256 -out $certs/$site/fullchain.pem &>/dev/null; } || { fail "Create SSL fullchain fails"; }
-        { openssl rsa -in $certs/$site/server.key -out $certs/$site/privkey.pem &>/dev/null; } || { fail "Create SSL privkey fails"; }
+        { openssl genrsa -out $certs/$site/server.key 2048 &>$file; } || { fail "Create SSL key fails"; }
+        { openssl req -new -key $certs/$site/server.key -sha256 -out $certs/$site/server.csr -subj "/CN=$site" &>$file; } || { fail "Create SSL csr fails"; }
+        { openssl x509 -req -days 365 -in $certs/$site/server.csr -signkey $certs/$site/server.key -sha256 -out $certs/$site/fullchain.pem &>$file; } || { fail "Create SSL fullchain fails"; }
+        { openssl rsa -in $certs/$site/server.key -out $certs/$site/privkey.pem &>$file; } || { fail "Create SSL privkey fails"; }
 
       fi
 
